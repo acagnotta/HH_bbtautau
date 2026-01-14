@@ -1,0 +1,183 @@
+ggHH_CH_0p00_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.03413688
+
+ggHH_CH_m20p00_CHBox_20p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: -20.0
+  CHBox: 20.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 2.10536405
+
+ggHH_CH_m20p00_CHBox_0p00_CHD_10p00_CuH_0p00_CHG_0p00:
+  CH: -20.0
+  CHBox: 0.0
+  CHD: 10.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.64632999
+
+ggHH_CH_m20p00_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_0p10:
+  CH: -20.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.1
+  xs: 1.98124652
+
+ggHH_CH_m20p00_CHBox_0p00_CHD_0p00_CuH_40p00_CHG_0p00:
+  CH: -20.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 40.0
+  CHG: 0.0
+  xs: 1.01238347
+
+ggHH_CH_m20p00_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: -20.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.75960786
+
+ggHH_CH_10p00_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: 10.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.42671903
+
+ggHH_CH_0p00_CHBox_m10p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: 0.0
+  CHBox: -10.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.20797555
+
+ggHH_CH_0p00_CHBox_20p00_CHD_10p00_CuH_0p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 20.0
+  CHD: 10.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.19997557
+
+ggHH_CH_0p00_CHBox_20p00_CHD_0p00_CuH_0p00_CHG_0p10:
+  CH: 0.0
+  CHBox: 20.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.1
+  xs: 1.20167996
+
+ggHH_CH_0p00_CHBox_20p00_CHD_0p00_CuH_40p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 20.0
+  CHD: 0.0
+  CuH: 40.0
+  CHG: 0.0
+  xs: 0.88537399
+
+ggHH_CH_0p00_CHBox_20p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 20.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.27250384
+
+ggHH_CH_0p00_CHBox_0p00_CHD_10p00_CuH_0p00_CHG_0p10:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 10.0
+  CuH: 0.0
+  CHG: 0.1
+  xs: 0.26274389
+
+ggHH_CH_0p00_CHBox_0p00_CHD_10p00_CuH_40p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 10.0
+  CuH: 40.0
+  CHG: 0.0
+  xs: 2.49543226
+
+ggHH_CH_0p00_CHBox_0p00_CHD_10p00_CuH_0p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 10.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.05928267
+
+ggHH_CH_0p00_CHBox_0p00_CHD_m5p00_CuH_0p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: -5.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.02614246
+
+ggHH_CH_0p00_CHBox_0p00_CHD_0p00_CuH_m20p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: -20.0
+  CHG: 0.0
+  xs: 0.33429675
+
+ggHH_CH_0p00_CHBox_0p00_CHD_0p00_CuH_40p00_CHG_0p10:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 40.0
+  CHG: 0.1
+  xs: 1.29558694
+
+ggHH_CH_0p00_CHBox_0p00_CHD_0p00_CuH_40p00_CHG_0p00:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 40.0
+  CHG: 0.0
+  xs: 2.26769988
+
+ggHH_CH_0p00_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_m0p05:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: -0.05
+  xs: 0.18234428
+
+ggHH_CH_0p00_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_0p10:
+  CH: 0.0
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.1
+  xs: 0.31823309
+
+ggHH_CH_2p13_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: 2.13
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.07555200
+
+ggHH_CH_m8p50_CHBox_0p00_CHD_0p00_CuH_0p00_CHG_0p00:
+  CH: -8.5
+  CHBox: 0.0
+  CHD: 0.0
+  CuH: 0.0
+  CHG: 0.0
+  xs: 0.09635439
