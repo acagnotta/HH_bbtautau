@@ -1,30 +1,75 @@
 SM_signal:
-  - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00/
-    - xs: 0.0879
+  GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00/
+    xs: 0.0879
+    kl: 1.0 
+    kt: 1.0
+    c2: 0.0
+    cg: 0.0
+    c2g: 0.0
 
 signals:
-  - GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00/
-    - xs: 
-  - GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00/
-    - xs: 
-  - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10/
-    - xs: 
-  - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35/
-    - xs: 
-  - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00/
-    - xs: 
-  - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00/
-    - xs: 
-  - GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00/
-    - xs: 
-  - GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00:
-    - path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00/
-    - xs: 
+  GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00/
+    xs: 
+    kl: 1.0 
+    kt: 0.0
+    c2: 0.0
+    cg: 0.0
+    c2g: 0.0
+  GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00/
+    xs:
+    kl: 0.0 
+    kt: 1.0
+    c2: 1.0
+    cg: 0.0
+    c2g: 0.0 
+  GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10/
+    xs:
+    kl: 1.0 
+    kt: 1.0
+    c2: 0.1
+    cg: 0.0
+    c2g: 0.0 
+  GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35/
+    xs:
+    kl: 1.0 
+    kt: 1.0
+    c2: 0.35
+    cg: 0.0
+    c2g: 0.0 
+  GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00/
+    xs:
+    kl: 1.0 
+    kt: 1.0
+    c2: 3.0
+    cg: 0.0
+    c2g: 0.0 
+  GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00/
+    xs:
+    kl: 1.0 
+    kt: 1.0
+    c2: -2.0
+    cg: 0.0
+    c2g: 0.0 
+  GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00/
+    xs:
+    kl: 2.45
+    kt: 1.0
+    c2: 0.0
+    cg: 0.0
+    c2g: 0.0 
+  GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00:
+    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00/
+    xs:
+    kl: 5.0
+    kt: 1.0
+    c2: 0.0
+    cg: 0.0
+    c2g: 0.0 
