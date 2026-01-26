@@ -35,7 +35,7 @@ signals:
     c2g: 0.0 
   GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35/
-    xs:
+    xs: 0.00940158
     kl: 1.0 
     kt: 1.0
     c2: 0.35
