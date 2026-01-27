@@ -130,7 +130,7 @@ def CreateCorrectionLibfile(poly_ratio, binning, var_names):
         json.dump(cset.model_dump(), f, indent=2)
     return 0
 
-with open("./config/mHH_binedges.yaml", 'r') as f:
+with open("./config/config.yaml", 'r') as f:
     config = yaml.safe_load(f)
 
 input_samples =  os.path.join(".",config['input_samples'])

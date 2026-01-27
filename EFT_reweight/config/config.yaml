@@ -1,0 +1,7 @@
+2D_HEFT:
+  coeff: Coefficients_EFT/2D_HEFT/HEFT_3d_mhh_costhetastar_pthh_lowmass1000_5k_coeffs.json
+  cov_matrix: Coefficients_EFT/2D_HEFT/HEFT_3d_mhh_costhetastar_pthh_lowmass1000_5k_cov.json
+  
+input_samples: config/input_samples.yaml
+
+target_samples: GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35
