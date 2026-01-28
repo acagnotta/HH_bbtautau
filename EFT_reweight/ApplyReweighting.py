@@ -6,6 +6,10 @@ def DefineKinematicGenVariables(df):
     df = df.Define("mhh_gen", "GetMhhGen(GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, GenPart_statusFlags, GenPart_pdgId)")
     df = df.Define("pthh_gen", "GetPthhGen(GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, GenPart_statusFlags, GenPart_pdgId)")
     df = df.Define("costhetastar_gen", "GetCosThetaStarGen(GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, GenPart_statusFlags, GenPart_pdgId)")
+
+    df = df.Define("mhh_LHE", "GetMhhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
+    df = df.Define("pthh_LHE", "GetPthhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
+    df = df.Define("costhetastar_LHE", "GetCosThetaStarLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
     return df
 
 with open("./config/input_samples.yaml", 'r') as f:
@@ -44,17 +48,20 @@ NtotalEvents = df.Sum("nloweight").GetValue()
 df = DefineKinematicGenVariables(df)
 df = df.Define("w_nominal", f'nloweight * {input_xsec} / {NtotalEvents}')
 df = df.Define("w_reweight", f'nloweight*GetWeight(mhh_gen, pthh_gen, costhetastar_gen, "{file}") * {input_xsec} / {NtotalEvents}')
+df = df.Define("w_reweightLHE", f'nloweight*GetWeight(mhh_LHE, pthh_LHE, costhetastar_LHE, "{file}") * {input_xsec} / {NtotalEvents}')
 # df = df.Define("w_reweight", f'GetWeight(mhh_gen, pthh_gen, costhetastar_gen, "{file}")')
 
 
 output_file = ROOT.TFile(f"reweighted_sample_{target_sample_name}.root", "RECREATE")
-df.Histo1D(("mhh_gen", ";m_{HH} [GeV]; Events", 75, 250, 1000), "mhh_gen").GetValue().Write()
 df.Histo1D(("mhh_sm", ";m_{HH} [GeV]; Events", 75, 250, 1000), "mhh_gen", "w_nominal").GetValue().Write()
 df.Histo1D(("pthh_sm", ";p_{T,HH} [GeV]; Events", 200, 0, 2000), "pthh_gen", "w_nominal").GetValue().Write()
 df.Histo1D(("costhetastar_sm", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar_gen", "w_nominal").GetValue().Write()
 df.Histo1D(("mhh_weighted", ";m_{HH} [GeV]; Events", 75, 250, 1000), "mhh_gen", "w_reweight").GetValue().Write()
 df.Histo1D(("pthh_weighted", ";p_{T,HH} [GeV]; Events", 200, 0, 2000), "pthh_gen", "w_reweight").GetValue().Write()
 df.Histo1D(("costhetastar_weighted", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar_gen", "w_reweight").GetValue().Write()
+df.Histo1D(("mhh_weightedLHE", ";m_{HH} [GeV]; Events", 75, 250, 1000), "mhh_LHE", "w_reweightLHE").GetValue().Write()
+df.Histo1D(("pthh_weightedLHE", ";p_{T,HH} [GeV]; Events", 200, 0, 2000), "pthh_LHE", "w_reweightLHE").GetValue().Write()
+df.Histo1D(("costhetastar_weightedLHE", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar_LHE", "w_reweightLHE").GetValue().Write()
 
 output_file.Close()
 print(f"Histograms saved to reweighted_sample_{target_sample_name}.root")
