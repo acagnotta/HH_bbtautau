@@ -1,4 +1,4 @@
-SM_signal:
+signals:
   GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00/
     xs: 0.030922
@@ -7,11 +7,9 @@ SM_signal:
     c2: 0.0
     cg: 0.0
     c2g: 0.0
-
-signals:
   GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00/
-    xs: 
+    xs: 0.068321
     kl: 1.0 
     kt: 0.0
     c2: 0.0
@@ -19,7 +17,7 @@ signals:
     c2g: 0.0
   GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00/
-    xs:
+    xs: 0.132486
     kl: 0.0 
     kt: 1.0
     c2: 1.0
@@ -27,7 +25,7 @@ signals:
     c2g: 0.0 
   GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10/
-    xs:
+    xs: 0.016068
     kl: 1.0 
     kt: 1.0
     c2: 0.1
@@ -43,7 +41,7 @@ signals:
     c2g: 0.0 
   GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00/
-    xs:
+    xs: 2.617158
     kl: 1.0 
     kt: 1.0
     c2: 3.0
@@ -51,7 +49,7 @@ signals:
     c2g: 0.0 
   GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00/
-    xs:
+    xs: 1.791638
     kl: 1.0 
     kt: 1.0
     c2: -2.0
@@ -59,7 +57,7 @@ signals:
     c2g: 0.0 
   GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00/
-    xs:
+    xs: 0.013405
     kl: 2.45
     kt: 1.0
     c2: 0.0
@@ -67,7 +65,7 @@ signals:
     c2g: 0.0 
   GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00:
     path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00/
-    xs:
+    xs: 0.088012
     kl: 5.0
     kt: 1.0
     c2: 0.0

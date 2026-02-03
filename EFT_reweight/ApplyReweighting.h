@@ -50,6 +50,14 @@ TLorentzVector GetDiHiggsP4LHE(rvec_f LHEPart_pt, rvec_f LHEPart_eta, rvec_f LHE
     return dihiggs_p4;
 }
 
+double GetInputXSec(const std::string& sample_name) {{
+    auto it = xSec.find(sample_name);
+    if (it != xSec.end()) {{
+        return it->second;
+    }}
+    return 1.0;
+}}
+
 float GetMhhGen(rvec_f GenPart_pt, rvec_f GenPart_eta, rvec_f GenPart_phi, rvec_f GenPart_mass, rvec_i GenPart_statusFlags, rvec_i GenPart_pdgId){
     float mhhGen = 0.;
     auto dihiggs_p4 = GetDiHiggsP4Gen(GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, GenPart_statusFlags, GenPart_pdgId);
@@ -124,12 +132,12 @@ float GetCosThetaStarLHE(rvec_f LHEPart_pt, rvec_f LHEPart_eta, rvec_f LHEPart_p
     return cosThetaStarGen;
 }
 
-float GetWeight(float mhh_gen, float pthh_gen, float costhetastar_gen, const std::string& file){
+float GetWeight(float mhh_gen, float pthh_gen, float costhetastar_gen, const std::string& sampleName, const std::string& file, const std::string& target){
     auto cset = CorrectionSet::from_file(file);
-    auto weights = cset->at("HEFT_reweighting");
+    auto weights = cset->at("HEFT_reweighting_" + target);
     float weight = 1.0;
     if (pthh_gen >= 0 && std::abs(costhetastar_gen) >= 0 && mhh_gen >= 250 && mhh_gen <= 1000) {
-        weight = weights->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen});
+        weight = weights->evaluate({sampleName, pthh_gen, std::abs(costhetastar_gen), mhh_gen});
     }
     return weight;
 }
