@@ -50,12 +50,20 @@ TLorentzVector GetDiHiggsP4LHE(rvec_f LHEPart_pt, rvec_f LHEPart_eta, rvec_f LHE
     return dihiggs_p4;
 }
 
-double GetInputXSec(const std::string& sample_name) {{
+float GetInputXSec(const std::string& sample_name) {{
     auto it = xSec.find(sample_name);
     if (it != xSec.end()) {{
         return it->second;
     }}
     return 1.0;
+}}
+
+float GetNtotalEvents(const std::string& sample_name) {{
+    auto it = NtotalEvents.find(sample_name);
+    if (it != NtotalEvents.end()) {{
+        return it->second;
+    }}
+    return -1;
 }}
 
 float GetMhhGen(rvec_f GenPart_pt, rvec_f GenPart_eta, rvec_f GenPart_phi, rvec_f GenPart_mass, rvec_i GenPart_statusFlags, rvec_i GenPart_pdgId){
