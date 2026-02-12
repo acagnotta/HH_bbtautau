@@ -144,7 +144,7 @@ float GetWeight(float mhh_gen, float pthh_gen, float costhetastar_gen, const std
     auto cset = CorrectionSet::from_file(file);
     auto weights = cset->at("HEFT_reweighting_" + target);
     float weight = 1.0;
-    if (pthh_gen >= 0 && std::abs(costhetastar_gen) >= 0 && mhh_gen >= 250 && mhh_gen <= 1000) {
+    if (pthh_gen >= 0 && std::abs(costhetastar_gen) >= 0 && mhh_gen >= 250) {
         weight = weights->evaluate({sampleName, pthh_gen, std::abs(costhetastar_gen), mhh_gen});
     }
     return weight;
