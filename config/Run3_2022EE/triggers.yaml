@@ -131,8 +131,10 @@ singleMu:
         cut: TrigObj_id == 13 && (TrigObj_filterBits&8)!=0
       doMatching: True
       jsonTRGcorrection_key:
-        2022_Summer22: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff
-        2022_Summer22EE: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff
+        2022_Summer22: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
+        2022_Summer22EE: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
+        2023_Summer23: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
+        2023_Summer23BPix: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
       jsonTRGcorrection_elepath: "placeholder"
 
 singleEle:

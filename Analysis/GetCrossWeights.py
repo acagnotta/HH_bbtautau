@@ -5,8 +5,7 @@ if __name__ == "__main__":
     sys.path.append(os.environ["ANALYSIS_PATH"])
 # ROOT.gROOT.ProcessLine('#include "include/AnalysisTools.h"')
 
-ROOT.gInterpreter.Declare(
-    """
+ROOT.gInterpreter.Declare("""
     #include <cmath>
     
     float get_scale_factor_error(const float& effData, const float& effMC, const float& errData, const float& errMC, std::string err_name) {
@@ -91,8 +90,7 @@ ROOT.gInterpreter.Declare(
         }
         return sferr;
     }
-    """
-)
+    """)
 
 
 def get_scale_factor_error(eff_data, eff_mc, err_data, err_mc):
@@ -206,21 +204,21 @@ def defineTriggerWeightsErrors(dfBuilder):
     # dfBuilder.df = dfBuilder.df.Define("Err_MC_mu", Err_MC_mu)
     # dfBuilder.df = dfBuilder.df.Define("trigSF_mu_err", """get_scale_factor_error(Eff_Data_mutau, Eff_MC_mutau, Err_Data_mu, Err_MC_mu,"trigSF_mu_err")""")
 
-    if dfBuilder.period == "Run2_2016" or dfBuilder.period == "Run2_2016_HIPM":
-        dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_cross_mu_Up", " 1.f ")
-        dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_cross_mu_Down", " 1.f ")
-        dfBuilder.df = dfBuilder.df.Define(
-            f"weight_trigSF_SL_mu_Up",
-            "if ((HLT_singleMu) && Legacy_region ) {return weight_tau1_TrgSF_singleMuUp_rel*weight_tau1_TrgSF_singleMuCentral;} return 1.f; ",
-        )
-        dfBuilder.df = dfBuilder.df.Define(
-            f"weight_trigSF_SL_mu_Down",
-            "if ((HLT_singleMu) && Legacy_region ) {return weight_tau1_TrgSF_singleMuUp_rel*weight_tau1_TrgSF_singleMuCentral;} return 1.f; ",
-        )
-        dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mu_Up", " 1.f; ")
-        dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mu_Down", " 1.f; ")
-        dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mutau_tau_Up", "  1.f; ")
-        dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mutau_tau_Down", "  1.f; ")
+    # if dfBuilder.period == "Run2_2016" or dfBuilder.period == "Run2_2016_HIPM":
+    #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_cross_mu_Up", " 1.f ")
+    #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_cross_mu_Down", " 1.f ")
+    #     dfBuilder.df = dfBuilder.df.Define(
+    #         f"weight_trigSF_SL_mu_Up",
+    #         "if ((HLT_singleMu) && Legacy_region ) {return weight_tau1_TrgSF_singleMuUp_rel*weight_tau1_TrgSF_singleMuCentral;} return 1.f; ",
+    #     )
+    #     dfBuilder.df = dfBuilder.df.Define(
+    #         f"weight_trigSF_SL_mu_Down",
+    #         "if ((HLT_singleMu) && Legacy_region ) {return weight_tau1_TrgSF_singleMuUp_rel*weight_tau1_TrgSF_singleMuCentral;} return 1.f; ",
+    #     )
+    #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mu_Up", " 1.f; ")
+    #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mu_Down", " 1.f; ")
+    #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mutau_tau_Up", "  1.f; ")
+    #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_mutau_tau_Down", "  1.f; ")
     # else:
     #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_cross_mu_Up", "if ((HLT_singleMu || HLT_mutau) && Legacy_region && Eff_MC_mutau!=0) {return weight_HLT_muTau + trigSF_cross_mu_err;} return 1.f; ")
     #     dfBuilder.df = dfBuilder.df.Define(f"weight_trigSF_cross_mu_Down", "if ((HLT_singleMu || HLT_mutau) && Legacy_region && Eff_MC_mutau!=0) {return weight_HLT_muTau - trigSF_cross_mu_err;} return 1.f; ")

@@ -108,11 +108,15 @@ singleMu:
     - HLT_IsoMu24
   legs:
     - offline_obj:
-        cut: "{obj}_legType == Leg::mu && {obj}_pt > 26"  # {obj}_pt > 26 && abs({obj}_eta) < 2.4
+        cut: "{obj}_legType == Leg::mu && {obj}_pt > 26" # {obj}_pt > 26 && abs({obj}_eta) < 2.4
       online_obj:
-        cut: TrigObj_id==13 && (TrigObj_filterBits&8)!=0
+        cut: TrigObj_id == 13 && (TrigObj_filterBits&8)!=0
       doMatching: True
-      jsonTRGcorrection_key: { "2022_Summer22": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff", "2022_Summer22EE": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff", "2023_Summer23": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff", "2023_Summer23BPix": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff" }
+      jsonTRGcorrection_key:
+        2022_Summer22: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
+        2022_Summer22EE: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
+        2023_Summer23: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
+        2023_Summer23BPix: NUM_IsoMu24_DEN_CutBasedId{MuIDWP}_and_PFIso{MuIDWP}_{DataMC}eff
       jsonTRGcorrection_elepath: "placeholder"
 
 singleEle:

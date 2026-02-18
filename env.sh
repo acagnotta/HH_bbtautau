@@ -14,6 +14,8 @@ action() {
     local this_file_path="$this_dir/$(basename $this_file)"
     export ANALYSIS_PATH="$this_dir"
     export HH_INFERENCE_PATH="$ANALYSIS_PATH/inference"
+    export FLAF_CMSSW_VERSION="CMSSW_16_0_0_pre4"
+    export FLAF_CMSSW_COMPILER="gcc13"
     source $ANALYSIS_PATH/FLAF/env.sh "$this_file_path" "$@"
 }
 

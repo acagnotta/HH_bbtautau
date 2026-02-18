@@ -8,6 +8,8 @@ DY:
     - DYto2Tau_M_50
 
 DY_M_10to50:
+  name: "DY M10to50"
+  color: "kAzure+10"
   datasets:
     - DYto2E_M_10to50_amcatnloFXFX
     - DYto2Mu_M_10to50_amcatnloFXFX
@@ -17,7 +19,6 @@ DYto2E_M_50:
   processors: *DY_processors
   datasets:
     - DYto2E_M_50_amcatnloFXFX
-    - DYto2E_M_50_amcatnloFXFX_ext1
     - DYto2E_M_50_0J_amcatnloFXFX
     - DYto2E_M_50_1J_amcatnloFXFX
     - DYto2E_M_50_2J_amcatnloFXFX
@@ -36,7 +37,6 @@ DYto2Mu_M_50:
   processors: *DY_processors
   datasets:
     - DYto2Mu_M_50_amcatnloFXFX
-    - DYto2Mu_M_50_amcatnloFXFX_ext1
     - DYto2Mu_M_50_0J_amcatnloFXFX
     - DYto2Mu_M_50_1J_amcatnloFXFX
     - DYto2Mu_M_50_2J_amcatnloFXFX
@@ -99,7 +99,6 @@ ttH:
   datasets:
     - TTHtoNon2B_M125
     - TTHto2B_M125
-
 
 WtoLNu:
   name: "W+jets"
@@ -234,31 +233,10 @@ VBFHHto2B2Tau:
 Data:
   name: "Data"
   datasets:
-    - EGamma_Run2022C
-    - EGamma_Run2022D
-    - Muon_Run2022C
-    - Muon_Run2022D
-    - SingleMuon_Run2022C
-    - DoubleMuon_Run2022C
-    - MuonEG_Run2022C
-    - MuonEG_Run2022D
-    - Tau_Run2022C
-    - Tau_Run2022D
+    - TO ADD
 
-custom_CI_Background:
-  name: "CI -- Background"
-  color: "kGreen-3"
-  datasets:
-    - TTto2L2Nu
-
-custom_CI_Signal:
+custom_CI:
   name: "custom for CI and test purposes"
   color: "kAzure+10"
   datasets:
-    - GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00
-
-custom_CI_Data:
-  name: "CI -- Data"
-  color: "kAzure+10"
-  datasets:
-    - Muon_Run2022D
+    - custom_CI

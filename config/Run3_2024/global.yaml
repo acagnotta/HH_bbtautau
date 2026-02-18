@@ -1,0 +1,8 @@
+triggerFile: config/Run3_2024/triggers.yaml
+corrections:
+  btag:
+    stages: [ AnaTuple ]
+    modes:
+      AnaTuple: none
+    tagger: UParTAK4
+    jetCollection: centralJet

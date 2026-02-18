@@ -195,7 +195,7 @@ def RecoJetSelection(df, era):
     )
     df = df.Define(
         "Jet_bIncl",
-        f"v_ops::pt(Jet_p4)>20 && abs(v_ops::eta(Jet_p4)) < 2.5 && ( Jet_jetId & 2 ) {jet_puID_cut}",
+        f"v_ops::pt(Jet_p4)>20 && abs(v_ops::eta(Jet_p4)) < 2.5 && ( Jet_passJetIdTight ) {jet_puID_cut}",
     )
     df = df.Define(
         "FatJet_bbIncl", "FatJet_msoftdrop > 30 && abs(v_ops::eta(FatJet_p4)) < 2.5"
@@ -217,7 +217,7 @@ def ExtraRecoJetSelection(df, era):
     )
     df = df.Define(
         "ExtraJet_B0",
-        f"v_ops::pt(Jet_p4)>20 && abs(v_ops::eta(Jet_p4)) < 5 && ( Jet_jetId & 2 ) {jet_puID_cut}",
+        f"v_ops::pt(Jet_p4)>20 && abs(v_ops::eta(Jet_p4)) < 5 && ( Jet_passJetIdTight ) {jet_puID_cut}",
     )
     df = df.Define(
         f"ObjectsToRemoveOverlap",
@@ -263,7 +263,7 @@ def DefineHbbCand(df, met_type):
 def VBFJetSelection(df):
     df = df.Define(
         "VBFJet_B0",
-        "v_ops::pt(Jet_p4) > 20 && abs(v_ops::eta(Jet_p4)) < 5 && (Jet_jetId & 2)",
+        "v_ops::pt(Jet_p4) > 20 && abs(v_ops::eta(Jet_p4)) < 5 && ( Jet_passJetIdTight )",
     )
     df = df.Define(
         "VBFObjectsToRemoveOverlap",

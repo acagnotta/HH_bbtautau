@@ -2,6 +2,7 @@ anaTupleDef: AnaProd/anaTupleDef.py
 histTupleDef: Analysis/histTupleDef.py
 analysis_import: Analysis.hh_bbtautau
 phys_model: BaseModel
+use_cmssw_env_AnaTupleProduction: true
 signal_types:
   - HHnonRes
   # - GluGluToRadion
@@ -27,6 +28,15 @@ deepTauWPs:
     VSjet: Medium
 
 corrections:
+  lumi: { stage: AnaTuple }
+  xs: { stage: AnaTuple }
+  gen: { stage: AnaTuple }
+  pu:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    enabled:
+      AnaTuple: true
+      AnaTupleMerge: false
+  base: { stage: AnaTupleMerge }
   tauID: { stage: HistTuple }
   tauES: { stage: AnaTuple }
   mu:
@@ -37,14 +47,13 @@ corrections:
       tkRelIso: Muon_tkRelIso
       highPtId: Muon_highPtId
       mediumId: Muon_mediumId
+      looseId: Muon_looseId
   trigger:
     stage: HistTuple
     mode: efficiency
   ele: { stage: HistTuple }
-  muScaRe: { stage: HistTuple }
+  muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
   eleES: { stage: AnaTuple }
-  MC_Lumi_pu: { stage: AnaTuple }
-  pu: { stages: [ AnaCache, AnaTuple ] }
   JEC: { stage: AnaTuple }
   JER:
     stage: AnaTuple
@@ -55,6 +64,16 @@ corrections:
       AnaTuple: shape
     tagger: particleNet
     jetCollection: centralJet
+
+extraFormat_for_triggerMatchingAndSF:
+  pt: "nano"
+muon_pt_for_presel: "nano"
+mu_pt_for_triggerMatchingAndSF: "nano"
+mu_pt_for_selection: "pt"
+mu_pt_for_definitions: "ScaRe" # here options are different: corr, nano, bsConstrainedPt, roccor
+muonID_WP_for_triggerSF: "Tight" # only medium or tight for trigger SF, both iso and ID
+muIDWP: "Tight"
+muIsoWP: "Tight"
 
 variables:
   - tau1_pt
@@ -105,7 +124,6 @@ boosted_categories:
   - boosted_cat3_masswindow
 categories:
   - inclusive
-  - btag_shape
   - baseline
   - boosted_baseline
   # - boosted_baseline_cat3
@@ -134,6 +152,7 @@ categories:
   # - res2b_cat3_masswindow
   # - res1b_cat3_masswindow
   # - res0b_cat3_masswindow
+  - vbf_inclusive
 
 requireHbbJets: True
 storeExtraJets: False
@@ -180,8 +199,6 @@ triggers:
 hist_triggers:
   eTau:
     default: ( HLT_singleEle && Legacy_region )  # ( ( (HLT_singleEle || HLT_etau ) && Legacy_region ) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
-    Run2_2016: ( ( (HLT_singleEle && SingleEle_region) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) )))
-    Run2_2016_HIPM: ( ( (HLT_singleEle && SingleEle_region) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) )))
   muTau:
     default: (HLT_singleMu && Legacy_region)  # (( (HLT_singleMu || HLT_mutau ) && Legacy_region ) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
   tauTau:
@@ -228,6 +245,8 @@ category_definition:
   boosted_cat3: "!(res2b_cat3) && boosted"  # (SelectedFatJet_p4[fatJet_sel && SelectedFatJet_particleNet_MD_JetTagger>={pNetWP}].size()>0) && {region}_boosted"
   res1b_cat3: "!(res2b_cat3) && !(boosted_baseline_cat3) && nSelBtag == 1"
   res0b_cat3: "!(res2b_cat3) && !(boosted_baseline_cat3) && nSelBtag == 0"
+
+  vbf_inclusive: "nVBFJet >= 2"
 
   # w/ mass window
   # boosted_baseline: "(SelectedFatJet_p4[fatJet_sel].size()>0)" (commenting this out because it has been defined under w/o mass window already)

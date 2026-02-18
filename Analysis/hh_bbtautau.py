@@ -3,10 +3,6 @@ import ROOT
 if __name__ == "__main__":
     sys.path.append(os.environ["ANALYSIS_PATH"])
 
-if __name__ == "__main__":
-    sys.path.append(os.environ["ANALYSIS_PATH"])
-    sys.path.append(os.environ["ANALYSIS_PATH"])
-
 from FLAF.Common.HistHelper import *
 from Analysis.GetCrossWeights import *
 
@@ -29,6 +25,65 @@ WorkingPointsDeepFlav = {
     "Run3_2023": {"Loose": 0.0479, "Medium": 0.2431, "Tight": 0.6553},
     "Run3_2023BPix": {"Loose": 0.048, "Medium": 0.2435, "Tight": 0.6563},
 }
+
+
+def createInvMass(df):
+    df = df.Define("tautau_m_vis", "static_cast<float>((tau1_p4+tau2_p4).M())")
+    particleNet_mass = (
+        "particleNet_mass"
+        if "SelectedFatJet_particleNet_mass_boosted" in df.GetColumnNames()
+        else "particleNetLegacy_mass"
+    )
+    df = df.Define(
+        "bb_m_vis_pnet",
+        f"""
+                   return static_cast<float>(SelectedFatJet_{particleNet_mass}_boosted);
+                   """,
+    )
+    df = df.Define(
+        "bb_m_vis_softdrop",
+        f"""
+                   return static_cast<float>(SelectedFatJet_msoftdrop_boosted);
+                   """,
+    )
+    df = df.Define(
+        "bb_m_vis_fj",
+        f"""
+                   return static_cast<float>(SelectedFatJet_mass_boosted);
+                    """,
+    )
+
+    df = df.Define(
+        "bb_m_vis",
+        f""" if(b1_pt < 0. || b2_pt < 0.) return 0.f; return static_cast<float>((b1_p4+b2_p4).M());""",
+    )
+    df = df.Define(
+        "bbtautau_mass_boosted",
+        """return static_cast<float>((SelectedFatJet_p4_boosted+tau1_p4+tau2_p4).M());""",
+    )
+    df = df.Define(
+        "bbtautau_mass",
+        """if(b1_pt < 0. || b2_pt < 0.) return 0.f; return static_cast<float>((b1_p4+b2_p4+tau1_p4+tau2_p4).M());""",
+    )
+    df = df.Define("dR_tautau", "ROOT::Math::VectorUtil::DeltaR(tau1_p4, tau2_p4)")
+    df = df.Define("dR_bb", "ROOT::Math::VectorUtil::DeltaR(b1_p4, b2_p4)")
+    df = df.Define("Htt_p4", "(tau1_p4 + tau2_p4)")
+    df = df.Define("Hbb_p4", "(b1_p4 + b2_p4)")
+    df = df.Define("dR_Htt_Hbb", "ROOT::Math::VectorUtil::DeltaR(Htt_p4, Hbb_p4)")
+    df = df.Define("deltaEta_Htt_Hbb", "(Htt_p4.Eta() - Hbb_p4.Eta())")
+    df = df.Define(
+        "deltaPhi_Htt_Hbb", "ROOT::Math::VectorUtil::DeltaPhi(Htt_p4, Hbb_p4)"
+    )
+
+    df = df.Define("pt_HH", "((Htt_p4 + Hbb_p4).Pt())")
+
+    for tau_idx in [1, 2]:
+        for met_var in ["met", "metnomu", "met_nano"]:
+            df = df.Define(
+                f"tau{tau_idx}_{met_var}_mt",
+                f"static_cast<float>((tau{tau_idx}_p4+{met_var}_p4).Mt())",
+            )
+    return df
 
 
 def createKeyFilterDict(global_params, period):
@@ -130,7 +185,7 @@ def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
 def GetWeight(channels):
     weights_dict = {}
     weights_to_apply = [
-        "weight_MC_Lumi_pu"
+        "weight_base"
     ]  # , "weight_L1PreFiring_Central","weight_L1PreFiring_ECAL_Central", "weight_L1PreFiring_Muon_Central"]
     trg_weights_dict = {
         "eTau": [
@@ -192,7 +247,7 @@ def GetWeight(channels):
     }
     weights_full_string = ""
     for channel in channels:
-        weights_list = ["weight_MC_Lumi_pu"]
+        weights_list = ["weight_base"]
         # weights_list.extend(trg_weights_dict[channel]) ## currently commented because there are no trigger weights ??
         weights_list.extend(ID_weights_dict[channel])
 
@@ -456,13 +511,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             )
 
     def defineLeptonPreselection(self):  # needs channel def
-        if self.period == "Run2_2016" or self.period == "Run2_2016_HIPM":
-            self.df = self.df.Define(
-                "eleEta2016",
-                "if(eE) {return (abs(tau1_eta) < 2 && abs(tau2_eta)<2); } if(eTau||eMu) {return (abs(tau1_eta) < 2); } return true;",
-            )
-        else:
-            self.df = self.df.Define("eleEta2016", "return true;")
         self.df = self.df.Define(
             "muon1_tightId",
             "if(muTau || muMu) {return (tau1_Muon_tightId && tau1_Muon_pfRelIso04_all < 0.15); } return true;",
@@ -488,7 +536,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.df = self.df.Define(
             f"lepton_preselection",
-            "eleEta2016 && tau1_iso_medium && muon1_tightId && muon2_tightId && firstele_mvaIso",
+            "tau1_iso_medium && muon1_tightId && muon2_tightId && firstele_mvaIso",
         )
 
     def defineQCDRegions(self):

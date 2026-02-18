@@ -3,7 +3,7 @@
     module: FLAF.Processors.MCStitching
     class: MCStitcher
     config: FLAF/config/Processors/stitching_DY_amcatnlo_Vpt_NpNLO.yaml
-    stages: [ AnaCache, AnaTuple ]
+    stages: [ AnaTuple, AnaTupleMerge ]
     dependency_level:
-      AnaCache: dataset
-      AnaTuple: process
+      AnaTuple: file
+      AnaTupleMerge: process

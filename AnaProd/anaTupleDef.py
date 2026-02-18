@@ -1,6 +1,8 @@
+import os
 import AnaProd.baseline as AnaBaseline
 import FLAF.Common.BaselineSelection as CommonBaseline
 from Corrections.Corrections import Corrections
+import ROOT
 
 loadTF = True
 loadHHBtag = True
@@ -28,6 +30,7 @@ Muon_observables = [
     "Muon_highPtId",
     "Muon_tightId",
     "Muon_mediumId",
+    "Muon_looseId",
 ]
 Electron_observables = [
     "Electron_mvaNoIso_WP80",
@@ -68,7 +71,7 @@ JetObservables = [
     "hfcentralEtaStripSize",
     "hfsigmaEtaEta",
     "hfsigmaPhiPhi",
-    "jetId",
+    # "jetId",
     "muEF",
     "muonSubtrFactor",
     "nConstituents",
@@ -96,6 +99,9 @@ JetObservables = [
     "ptRes",
     "idbtagPNetB",
     "HHbtag",
+    "passJetIdTight",
+    "passJetIdTightLepVeto",
+    "isInsideVetoRegion",
 ]
 JetObservablesMC = ["hadronFlavour", "partonFlavour"]
 FatJetObservables = [
@@ -195,6 +201,32 @@ defaultColToSave = [
 ]
 
 
+initialized = False
+
+
+def Initialize(setup, dataset_name):
+    global initialized
+    if not initialized:
+        header_path_HHbTag = "include/HHbTagScores.h"
+        lib_path = os.path.join(
+            os.environ["FLAF_CMSSW_BASE"],
+            "lib",
+            os.environ["FLAF_CMSSW_ARCH"],
+            "libHHToolsHHbtag.so",
+        )
+        load_result = ROOT.gSystem.Load(lib_path)
+        if load_result != 0:
+            raise RuntimeError(
+                f"HHBtagWrapper failed to load with status {load_result}"
+            )
+        ROOT.gInterpreter.Declare(f'#include "{header_path_HHbTag}"')
+        ROOT.gROOT.ProcessLine(
+            f'HHBtagWrapper::Initialize("{os.environ["CMSSW_BASE"]}/src/HHTools/HHbtag/models/", 3)'
+        )
+
+        initialized = True
+
+
 def getDefaultColumnsToSave(isData):
     colToSave = defaultColToSave.copy()
     if not isData:
@@ -212,7 +244,10 @@ def addAllVariables(
     applyTriggerFilter,
     global_params,
     channels,
+    dataset_cfg,
 ):
+    dfw.Apply(Corrections.getGlobal().JetVetoMap.GetJetVetoMap)
+    dfw.Apply(CommonBaseline.ApplyJetVetoMap)
     dfw.Apply(AnaBaseline.RecoHttCandidateSelection, global_params)
     dfw.Apply(AnaBaseline.RecoJetSelection, global_params["era"])
     dfw.Apply(AnaBaseline.ThirdLeptonVeto)
@@ -220,8 +255,6 @@ def addAllVariables(
     dfw.DefineAndAppend("Hbb_isValid", "HbbCandidate.has_value()")
     dfw.Apply(AnaBaseline.ExtraRecoJetSelection, global_params["era"])
     dfw.Apply(AnaBaseline.VBFJetSelection)
-    dfw.Apply(Corrections.getGlobal().JetVetoMap.GetJetVetoMap)
-    dfw.Apply(CommonBaseline.ApplyJetVetoMap)
     dfw.Apply(Corrections.getGlobal().jet.getEnergyResolution)
     dfw.Apply(Corrections.getGlobal().btag.getWPid, "Jet")
     jet_obs = []
