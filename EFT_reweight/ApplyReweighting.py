@@ -8,7 +8,7 @@ ROOT.EnableImplicitMT(4)
 usage                   = 'python3 ApplyReweighting.py '
 parser                  = optparse.OptionParser(usage)
 parser.add_option('--doTarget', dest='doTarget', action='store_true', default=False, help='If true, the script will process the target sample. Enable this option only if doReweight is false')
-parser.add_option('--doReweight', dest='doReweight', action='store_true', default=True, help='If true, the script will process the input samples and apply reweighting. Enable this option only if doTarget is false')
+parser.add_option('--doReweight', dest='doReweight', action='store_true', default=False, help='If true, the script will process the input samples and apply reweighting. Enable this option only if doTarget is false')
 parser.add_option('--jsonFile', dest='jsonFile', type=str, default="HEFT_reweighting.json", help='Path to the JSON file containing the reweighting information (output of HEFT_generalizedweight.py)')
 parser.add_option('-c', '--config', dest='config', type=str, default="./config/config.yaml", help='Path to the config file')
 parser.add_option('-o', '--output', dest='output', type=str, default="./reweighted_sample.root", help='Path to the output ROOT file (of reweighted sample or target sample if --doTarget is set)')
@@ -23,9 +23,9 @@ if doTarget and doReweight:
     exit(1)
 
 def DefineKinematicGenVariables(df):
-    df = df.Define("mhh_LHE", "GetMhhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
-    df = df.Define("pthh_LHE", "GetPthhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
-    df = df.Define("costhetastar_LHE", "GetCosThetaStarLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
+    df = df.Define("mhh", "GetMhhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
+    df = df.Define("pthh", "GetPthhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
+    df = df.Define("costhetastar", "GetCosThetaStarLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)")
     return df
 
 with open(config_path, 'r') as f:
@@ -68,6 +68,7 @@ mhh_binning = array.array('d', [250, 270, 290, 310, 330, 350, 370, 390, 410, 430
 pthh_binning = array.array('d', [0, 20, 40, 60, 80, 100, 140, 200, 290, 2500])
 if doReweight:
     file = json_file
+    filePDF = "./pdf_values.json"
 
     print("Creating RDataFrame for input samples...")
     df = ROOT.RDataFrame(RSamples_inputs)
@@ -102,22 +103,24 @@ if doReweight:
         NtotalEvents = df.Sum("nloweight").GetValue()
         print(f"Total number of events (weighted) in input samples: {NtotalEvents}")
         df = df.Define("w_nominal", f'nloweight * input_xsec / {NtotalEvents}')
-        df = df.Define("w_reweight", f'nloweight * GetWeight(mhh_LHE, pthh_LHE, costhetastar_LHE, SampleName, "{file}", "{target_sample_name}") * input_xsec / {NtotalEvents}')
+        df = df.Define("w_reweight", f'nloweight * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}") * input_xsec / {NtotalEvents}')
     else:
         df = df.DefinePerSample(f"NtotalEvents", f'GetNtotalEvents(rdfsampleinfo_.GetSampleName())')
         df = df.Define("w_nominal", f'nloweight * input_xsec / NtotalEvents')
-        df = df.Define("w_reweight", f'(1./{str(len(config["input_samples"]))}) * nloweight * GetWeight(mhh_LHE, pthh_LHE, costhetastar_LHE, SampleName, "{file}", "{target_sample_name}") * input_xsec / NtotalEvents')
+        df = df.Define("w_reweight", f'(1./{str(len(config["input_samples"]))}) * nloweight * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}") * input_xsec / NtotalEvents')
 
-    output_file = ROOT.TFile(f"reweighted_sample_{target_sample_name}_{str(len(config['input_samples']))}.root", "RECREATE")
-    df.Histo1D(("mhh_nominal", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh_LHE", "w_nominal").GetValue().Write()
-    df.Histo1D(("mhh_weighted", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh_LHE", "w_reweight").GetValue().Write()
-    df.Histo1D(("pthh_weighted", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh_LHE", "w_reweight").GetValue().Write()
-    df.Histo1D(("costhetastar_weighted", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar_LHE", "w_reweight").GetValue().Write()
+    output_file = ROOT.TFile(f"{output_name}", "RECREATE")
+    df.Histo1D(("mhh_nominal", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_nominal").GetValue().Write()
+    df.Histo1D(("mhh_weighted", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_reweight").GetValue().Write()
+    df.Histo1D(("pthh_weighted", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh", "w_reweight").GetValue().Write()
+    df.Histo1D(("costhetastar_weighted", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar", "w_reweight").GetValue().Write()
 
     output_file.Close()
-    print(f"Histograms saved to reweighted_sample_{target_sample_name}_{str(len(config['input_samples']))}.root")
+    print(f"Histograms saved to {output_name}")
 
 if doTarget:
+    filePDF = "./pdf_values.json"
+
     df_target = ROOT.RDataFrame(RSamples_target)
     df_target = df_target.Define("nloweight", "genWeight/abs(genWeight)")
     df_target = df_target.DefinePerSample("SampleName", "rdfsampleinfo_.GetSampleName()")
@@ -147,9 +150,9 @@ if doTarget:
     df_target = DefineKinematicGenVariables(df_target)
     df_target = df_target.Define("w_nominal", f'nloweight * {target_xsec}/ {NtotalEvents_target}')
 
-    output_file_target = ROOT.TFile(f"original_sample_{target_sample_name}.root", "RECREATE")
-    df_target.Histo1D(("mhh_LHE_target", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh_LHE", "w_nominal").GetValue().Write()
-    df_target.Histo1D(("pthh_LHE_target", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh_LHE", "w_nominal").GetValue().Write()
-    df_target.Histo1D(("costhetastar_LHE_target", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar_LHE", "w_nominal").GetValue().Write()
+    output_file_target = ROOT.TFile(f"{output_name}", "RECREATE")
+    df_target.Histo1D(("mhh_target", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_nominal").GetValue().Write()
+    df_target.Histo1D(("pthh_target", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh", "w_nominal").GetValue().Write()
+    df_target.Histo1D(("costhetastar_target", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar", "w_nominal").GetValue().Write()
     output_file_target.Close()
-    print(f"Histograms saved to original_sample_{target_sample_name}.root")
+    print(f"Histograms saved to {output_name}")

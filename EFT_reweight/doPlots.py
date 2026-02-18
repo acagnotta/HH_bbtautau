@@ -5,7 +5,13 @@ ROOT.gStyle.SetOptStat(0)
 
 def plot(h, folder, fillcolor, canv_name = "canv" ,extraTest="Preliminary", iPos=0, energy=13.6, lumi = 1,  addInfo="", ytitle = "Events"):
     if type(h)==list:
-        h1 = h[0]
+        tmp = 0
+        for hist in h:
+            if tmp<hist.GetMaximum():
+                tmp = hist.GetMaximum()
+            else:
+                h1 = hist
+        # h1 = h[0]
         # hist_dict = [k.GetName() for k in h]
     else:
         h1 = h
@@ -22,7 +28,7 @@ def plot(h, folder, fillcolor, canv_name = "canv" ,extraTest="Preliminary", iPos
     y_min = h1.GetMinimum()
     if y_min !=0: y_min = 0
     y_max = h1.GetMaximum()
-    y_max = y_max + 0.35 * (y_max - y_min)
+    y_max = y_max + 0.4 * (y_max - y_min)
     x_axis_name = h1.GetXaxis().GetTitle()
     canv = CMS.cmsCanvas(canv_name,x_min,x_max, y_min ,y_max,x_axis_name,ytitle,square=True, iPos=iPos)
 
@@ -83,15 +89,23 @@ def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Prelimin
     CMS.SaveCanvas(dicanv, folder+canv_name+".pdf")
 
 var = "mhh"
-inputs = "1"
-file_rw = ROOT.TFile.Open(f"reweighted_sample_GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35_{inputs}.root")
-h1 = file_rw.Get(f"{var}_weightedLHE")
-file_or = ROOT.TFile.Open("original_sample_GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35.root")
-h2 = file_or.Get(f"{var}_LHE_target")
+inputs = "5"
+# file_rw = ROOT.TFile.Open(f"./plots/reweightedWith{inputs}inputs.root")
+file_rw = ROOT.TFile.Open(f"./plots/pdfinputs.root")
+# h1 = file_rw.Get(f"{var}_weighted")
+h1 = file_rw.Get(f"h_mhh_output")
+# h3 = file_rw.Get(f"{var}_nominal")
+# file_or = ROOT.TFile.Open("original.root")
+# h2 = file_or.Get(f"{var}_target")
+h2 = file_rw.Get(f"h_mhh_target")
 h1.Scale(1.0, "width")
 h2.Scale(1.0, "width")
+# h3.Scale(1.0, "width")
 
 
 hist_ = [h1, h2]
 
-plot_withratio(hist_, "./", ROOT.kBlack, f"distr_{var}_{inputs}", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
+# plot_withratio(hist_, "./", ROOT.kBlack, f"distr_{var}_{inputs}", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
+plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/pdfReweighting", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
+
+# plot(h3, "./", ROOT.kRed, f"distr_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")

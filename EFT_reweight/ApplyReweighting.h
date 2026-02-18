@@ -149,3 +149,27 @@ float GetWeight(float mhh_gen, float pthh_gen, float costhetastar_gen, const std
     }
     return weight;
 }
+
+float GetWeightFromPoly(float mhh_gen, float pthh_gen, float costhetastar_gen, const std::string& sampleName, const std::string& file, const std::string& target){
+    auto cset = CorrectionSet::from_file(file);
+    auto poly_target = cset->at("HEFT_poly_" + target);
+    auto poly_input = cset->at("HEFT_poly_" + sampleName);
+    float weight = 1.0;
+    if (pthh_gen >= 0 && std::abs(costhetastar_gen) >= 0 && mhh_gen >= 250) {
+        weight = poly_target->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen}) / poly_input->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen});
+    }
+    return weight;
+}
+
+float GetWeightFromPolyPDF(float mhh_gen, float pthh_gen, float costhetastar_gen, const std::string& sampleName, const std::string& file, const std::string& target, const std::string& filePDF){
+    auto cset = CorrectionSet::from_file(file);
+    auto cset_pdf = CorrectionSet::from_file(filePDF);
+    auto poly_target = cset->at("HEFT_poly_" + target);
+    auto poly_input = cset->at("HEFT_poly_" + sampleName);
+    auto pdf_input = cset_pdf->at("PDF_weighted_SM");
+    float weight = 1.0;
+    if (pthh_gen >= 0 && std::abs(costhetastar_gen) >= 0 && mhh_gen >= 250) {
+        weight = pdf_input->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen}) * (poly_target->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen}) / poly_input->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen}));
+    }
+    return weight;
+}
