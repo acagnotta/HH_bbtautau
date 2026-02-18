@@ -44,9 +44,8 @@ def plot(h, folder, fillcolor, canv_name = "canv" ,extraTest="Preliminary", iPos
             CMS.cmsDraw(h1, "P", marker= 8 , mcolor = fillcolor)
         else:
             CMS.cmsDraw(h1, "P", marker= 8 ,lcolor = fillcolor, mcolor = fillcolor)
+    CMS.SaveCanvas(canv, folder+canv_name+".png", close = False)
     CMS.SaveCanvas(canv, folder+canv_name+".pdf")
-    # CMS.SaveCanvas(canv, folder+"/png/"+canv_name+".png")
-    # CMS.SaveCanvas(canv, folder+"/C/"+canv_name+".C")
 
 def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Preliminary", iPos=0, energy=13.6, lumi = 1,  addInfo="", ytitle = "Events"):
     CMS.SetExtraText(extraTest)
@@ -86,26 +85,27 @@ def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Prelimin
     CMS.cmsDraw(h_ratio, "esame")
     ref_line = ROOT.TLine(x_min, 1, x_max, 1)
     CMS.cmsDrawLine(ref_line, lcolor=ROOT.kBlack, lstyle=ROOT.kDotted)
+    CMS.SaveCanvas(dicanv, folder+canv_name+".png", close = False)
     CMS.SaveCanvas(dicanv, folder+canv_name+".pdf")
 
 var = "mhh"
 inputs = "5"
-# file_rw = ROOT.TFile.Open(f"./plots/reweightedWith{inputs}inputs.root")
-file_rw = ROOT.TFile.Open(f"./plots/pdfinputs.root")
-# h1 = file_rw.Get(f"{var}_weighted")
-h1 = file_rw.Get(f"h_mhh_output")
-# h3 = file_rw.Get(f"{var}_nominal")
-# file_or = ROOT.TFile.Open("original.root")
-# h2 = file_or.Get(f"{var}_target")
-h2 = file_rw.Get(f"h_mhh_target")
+file_rw = ROOT.TFile.Open(f"./plots/anaTuple_sm.root")
+# file_rw = ROOT.TFile.Open(f"./plots/pdfinputs.root")
+h1 = file_rw.Get(f"{var}_weighted")
+# h1 = file_rw.Get(f"h_mhh_output")
+h3 = file_rw.Get(f"{var}_nominal")
+file_or = ROOT.TFile.Open("./plots/anaTuple_target.root")
+h2 = file_or.Get(f"{var}_target")
+# h2 = file_rw.Get(f"h_mhh_target")
 h1.Scale(1.0, "width")
 h2.Scale(1.0, "width")
-# h3.Scale(1.0, "width")
+h3.Scale(1.0, "width")
 
 
 hist_ = [h1, h2]
 
 # plot_withratio(hist_, "./", ROOT.kBlack, f"distr_{var}_{inputs}", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
-plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/pdfReweighting", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
+plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_reweighting_sm", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
 
-# plot(h3, "./", ROOT.kRed, f"distr_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")
+plot(h3, "./", ROOT.kRed, f"./plots/anatuple_sm_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")

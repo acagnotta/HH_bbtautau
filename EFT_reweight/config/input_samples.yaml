@@ -1,6 +1,7 @@
 signals:
   GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00:
-    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00/
+    # path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00/
+    path: /eos/user/s/sadhani/HH_bbtautau_Run3/anaTuples/v2512/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00/
     xs: 0.034170
     kl: 1.0 
     kt: 1.0
@@ -32,7 +33,8 @@ signals:
     cg: 0.0
     c2g: 0.0 
   GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35:
-    path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35/
+    # path: /eos/cms/store/group/phys_higgs/HLepRare/skim_2025_v1/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35/
+    path: /eos/user/s/sadhani/HH_bbtautau_Run3/anaTuples/v2512/Run3_2022/GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35/
     xs: 0.010448
     kl: 1.0 
     kt: 1.0
