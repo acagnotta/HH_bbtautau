@@ -4,3 +4,4 @@
 /.law
 /config/user_custom.yaml
 __pycache__
+/EFT_reweight/plots
