@@ -105,23 +105,30 @@ if doReweight:
     ROOT.gInterpreter.Declare('{}'.format(open("./ApplyReweighting.h", "r").read()))
 
     df = df.DefinePerSample("input_xsec", "GetInputXSec(rdfsampleinfo_.GetSampleName())")
+    df = df.DefinePerSample(f"NtotalEvents", f'GetNtotalEvents(rdfsampleinfo_.GetSampleName())')
     df = DefineKinematicGenVariables(df)
     if input_anatuples_file:
-        weight = "weight_MC_Lumi_pu * input_xsec"
-    elif len(config['input_samples']) == 1:
-        weight = f"nloweight * input_xsec / {NtotalEvents}"
-        NtotalEvents = df.Sum("nloweight").GetValue()
-        print(f"Total number of events (weighted) in input samples: {NtotalEvents}")
-    else:
+        weight = f'(1./{str(len(config["input_samples"]))}) * weight_MC_Lumi_pu * input_xsec'
+    else :
         weight = f'(1./{str(len(config["input_samples"]))}) * nloweight * input_xsec / NtotalEvents'
+    # elif len(config['input_samples']) == 1:
+    #     weight = f"nloweight * input_xsec / {NtotalEvents}"
+    #     NtotalEvents = df.Sum("nloweight").GetValue()
+    #     print(f"Total number of events (weighted) in input samples: {NtotalEvents}")
+    # else:
+    #     weight = f'(1./{str(len(config["input_samples"]))}) * nloweight * input_xsec / NtotalEvents'
     
-    if len(config['input_samples'])==1:
-        df = df.Define("w_nominal", weight)
-        df = df.Define("w_reweight", f'{weight} * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}")')
-    else:
-        df = df.DefinePerSample(f"NtotalEvents", f'GetNtotalEvents(rdfsampleinfo_.GetSampleName())')
-        df = df.Define("w_nominal", f'nloweight * input_xsec / NtotalEvents')
-        df = df.Define("w_reweight", f'(1./{str(len(config["input_samples"]))}) * nloweight * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}") * input_xsec / NtotalEvents')
+    # if len(config['input_samples'])==1:
+    #     df = df.Define("w_nominal", weight)
+    #     df = df.Define("w_reweight", f'{weight} * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}")')
+    # else:
+    #     df = df.DefinePerSample(f"NtotalEvents", f'GetNtotalEvents(rdfsampleinfo_.GetSampleName())')
+    #     df = df.Define("w_nominal", f'{weight}')
+    #     df = df.Define("w_reweight", f'(1./{str(len(config["input_samples"]))}) * nloweight * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}") * input_xsec / NtotalEvents')
+
+    df = df.Define("w_nominal", weight)
+    df = df.Define("w_reweight", f'{weight} * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}")')
+
 
     output_file = ROOT.TFile(f"{output_name}", "RECREATE")
     df.Histo1D(("mhh_nominal", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_nominal").GetValue().Write()

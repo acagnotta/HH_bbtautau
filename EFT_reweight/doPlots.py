@@ -89,8 +89,8 @@ def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Prelimin
     CMS.SaveCanvas(dicanv, folder+canv_name+".pdf")
 
 var = "mhh"
-inputs = "5"
-file_rw = ROOT.TFile.Open(f"./plots/anaTuple_sm.root")
+inputs = "7"
+file_rw = ROOT.TFile.Open(f"./plots/anaTuple_{inputs}inputs.root")
 # file_rw = ROOT.TFile.Open(f"./plots/pdfinputs.root")
 h1 = file_rw.Get(f"{var}_weighted")
 # h1 = file_rw.Get(f"h_mhh_output")
@@ -106,6 +106,6 @@ h3.Scale(1.0, "width")
 hist_ = [h1, h2]
 
 # plot_withratio(hist_, "./", ROOT.kBlack, f"distr_{var}_{inputs}", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
-plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_reweighting_sm", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
+plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_reweighting_{inputs}inputs", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
 
-plot(h3, "./", ROOT.kRed, f"./plots/anatuple_sm_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")
+plot(h3, "./", ROOT.kRed, f"./plots/anatuple_{inputs}inputs_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")
