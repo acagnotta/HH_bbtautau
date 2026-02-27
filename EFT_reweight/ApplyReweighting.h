@@ -156,10 +156,27 @@ float GetWeightFromPoly(float mhh_gen, float pthh_gen, float costhetastar_gen, c
     auto poly_input = cset->at("HEFT_poly_" + sampleName);
     float weight = 1.0;
     if (pthh_gen >= 0 && std::abs(costhetastar_gen) >= 0 && mhh_gen >= 250) {
-        weight = poly_target->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen}) / poly_input->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen});
+        weight = poly_target->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen, "weight"}) / poly_input->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen, "weight"});
     }
     return weight;
 }
+
+float GetWeightErrorFromPoly(float mhh_gen, float pthh_gen, float costhetastar_gen, const std::string& sampleName, const std::string& file, const std::string& target){
+    auto cset = CorrectionSet::from_file(file);
+    auto poly_target = cset->at("HEFT_poly_" + target);
+    auto poly_input = cset->at("HEFT_poly_" + sampleName);
+    float weight = 1.0;
+    if (pthh_gen >= 0 && std::abs(costhetastar_gen) >= 0 && mhh_gen >= 250) {
+        float val_target = poly_target->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen, "weight"});
+        float val_input = poly_input->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen, "weight"});
+        float err_target = poly_target->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen, "error"});
+        float err_input = poly_input->evaluate({pthh_gen, std::abs(costhetastar_gen), mhh_gen, "error"});
+
+        // Error propagation for ratio: (a/b) -> sqrt((da/b)^2 + (a*db/b^2)^2)
+        weight = std::sqrt(std::pow(err_target / val_input, 2) + std::pow(val_target * err_input / (val_input * val_input), 2));
+    }
+    return weight;
+}   
 
 float GetWeightFromPolyPDF(float mhh_gen, float pthh_gen, float costhetastar_gen, const std::string& sampleName, const std::string& file, const std::string& target, const std::string& filePDF){
     auto cset = CorrectionSet::from_file(file);

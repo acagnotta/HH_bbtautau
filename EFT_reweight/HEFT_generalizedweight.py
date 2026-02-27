@@ -11,11 +11,13 @@ parser                  = optparse.OptionParser(usage)
 parser.add_option('-c', '--config', dest='config', type=str, default="./config/config.yaml", help='Path to the config file')
 parser.add_option('--poly_ratio_output', dest='poly_ratio_output', action='store_true', default=False, help='If true, the script will save poly ratios in the correctionlib file instead to save polys')
 parser.add_option('-o', '--output', dest='output', type=str, default="./HEFT_reweighting.json", help='Path to the output correctionlib file')
+parser.add_option('--dryrun', dest='dryrun', action='store_true', default=False, help='If true, the script will not save the correctionlib file, but will just print the poly values for the target samples and exit')
 (opt, args)             = parser.parse_args()
 
 config_file = opt.config
 output_name = opt.output
 save_poly_ratio = opt.poly_ratio_output
+dryrun = opt.dryrun
 
 
 def read_coeff_binning_from_json(filepath):
@@ -45,12 +47,12 @@ def read_coeff_binning_from_json(filepath):
         binning_dicts[var] = bins
     return binning_dicts, data
 
-def order_coeffs(coeffs_dict, binning):
+def order_coeffs(coeffs_dict, binning, key_ = "fitted_parameters"):
     nbin_var1 = len(binning['pthh']) - 1
     nbin_var2 = len(binning['theta']) - 1
     nbin_mhh = len(binning['mhh']) - 1
     ncoeffs = 23
-    coeffs_array = np.zeros((nbin_var1, nbin_var2, nbin_mhh, ncoeffs))
+    coeffs_array = np.zeros((nbin_var1, nbin_var2, nbin_mhh, ncoeffs)) if key_=="fitted_parameters" else np.zeros((nbin_var1, nbin_var2, nbin_mhh, ncoeffs, ncoeffs))
     for key in coeffs_dict.keys(): # pthh_0.0-20_theta_0.0-0.25
         elements = key.split('_')
         var1 = elements[0] # pthh
@@ -62,9 +64,24 @@ def order_coeffs(coeffs_dict, binning):
         for key2 in coeffs_dict[key].keys(): #250-270
             bin_range_mhh = list(map(float, key2.split('-')))
             idx_mhh = binning['mhh'].index(bin_range_mhh[0])
-            coeffs_line = list(map(float, coeffs_dict[key][key2]["fitted_parameters"]))
-            coeffs_array[idx_var1, idx_var2, idx_mhh, :] = coeffs_line
+            if key_=="fitted_parameters":
+                coeffs_line = list(map(float, coeffs_dict[key][key2][key_]))
+                coeffs_array[idx_var1, idx_var2, idx_mhh, :] = coeffs_line
+            elif key_=="covariance":
+                cov_matrix = np.array(coeffs_dict[key][key2][key_])
+                coeffs_array[idx_var1, idx_var2, idx_mhh, :, :] = cov_matrix
     return coeffs_array
+
+def save_max_error_from_cov(cov_HEFT, binning):
+    ncoeffs = 23
+    max_errors = np.zeros((len(binning['pthh']) - 1, len(binning['theta']) - 1, len(binning['mhh']) - 1, ncoeffs))
+    for i in range(cov_HEFT.shape[0]):
+        for j in range(cov_HEFT.shape[1]):
+            for k in range(cov_HEFT.shape[2]):
+                cov_matrix = cov_HEFT[i, j, k, :, :]
+                errors = np.diag(cov_matrix)
+                max_errors[i, j, k, :] = errors
+    return max_errors
 
 def prepare_params_for_poly(params):
     x = np.array([params['kt']**4, #1
@@ -93,7 +110,7 @@ def prepare_params_for_poly(params):
     ])
     return x
 
-def CreateCorrectionLibfilePolyRatio(poly_ratio, binning, var_names):
+def CreateCorrectionLibfilePolyRatio(poly_ratio, errors, binning, var_names):
     corr = []
     for i, target_sample in enumerate(target_samples):
         correction_name = f"HEFT_polyratio_{target_sample}"
@@ -105,6 +122,7 @@ def CreateCorrectionLibfilePolyRatio(poly_ratio, binning, var_names):
                 cs.Variable(name=var_names[0], type="real", description="HH system transverse momentum pTHH"),
                 cs.Variable(name=var_names[1], type="real", description="cos(theta*)"),
                 cs.Variable(name=var_names[2], type="real", description="HH invariant mass mHH"),
+                cs.Variable(name="type", type="string", description="type of output, can be 'weight' or 'error'"),
             ],
             output=cs.Variable(
                 name="weight", type="real", description="event-level weight"
@@ -128,7 +146,22 @@ def CreateCorrectionLibfilePolyRatio(poly_ratio, binning, var_names):
                                                 nodetype="binning",
                                                 input=var_names[2],
                                                 edges=binning[var_names[2]],
-                                                content=[poly_ratio[target_sample][key][i, j, k] for k in range(len(binning[var_names[2]]) - 1)],
+                                                content=[
+                                                    cs.Category(
+                                                        nodetype="category",
+                                                        input="type",
+                                                        content=[
+                                                            {
+                                                                "key": "weight",
+                                                                "value": poly_ratio[target_sample][key][i, j, k]
+                                                            },
+                                                            {
+                                                                "key": "error",
+                                                                "value": errors[target_sample][key][i, j, k]
+                                                            }
+                                                        ]
+                                                    )
+                                                    for k in range(len(binning[var_names[2]]) - 1)],
                                                 flow="clamp"
                                             ) for j in range(len(binning[var_names[1]]) - 1)
                                         ],
@@ -147,7 +180,7 @@ def CreateCorrectionLibfilePolyRatio(poly_ratio, binning, var_names):
     return 0
 
 
-def CreateCorrectionLibfilePoly(polys, binning, var_names):
+def CreateCorrectionLibfilePoly(polys, errors, binning, var_names):
     corr = []
     for i, sample in enumerate(polys.keys()):
         correction_name = f"HEFT_poly_{sample}"
@@ -159,6 +192,7 @@ def CreateCorrectionLibfilePoly(polys, binning, var_names):
                 cs.Variable(name=var_names[0], type="real", description="HH system transverse momentum pTHH"),
                 cs.Variable(name=var_names[1], type="real", description="cos(theta*)"),
                 cs.Variable(name=var_names[2], type="real", description="HH invariant mass mHH"),
+                cs.Variable(name="type", type="string", description="type of output, can be 'weight' or 'error'")
             ],
             output=cs.Variable(
                 name="poly value", type="real", description="value of poly for the given sample and bin"
@@ -177,7 +211,22 @@ def CreateCorrectionLibfilePoly(polys, binning, var_names):
                                         nodetype="binning",
                                         input=var_names[2],
                                         edges=binning[var_names[2]],
-                                        content=[polys[sample][i, j, k] for k in range(len(binning[var_names[2]]) - 1)],
+                                        content=[
+                                            cs.Category(
+                                                nodetype="category",
+                                                input="type",
+                                                content=[
+                                                    {
+                                                        "key": "weight",
+                                                        "value": polys[sample][i, j, k]
+                                                    },
+                                                    {
+                                                        "key": "error",
+                                                        "value": errors[sample][i, j, k]
+                                                    }
+                                                ]
+                                            )
+                                            for k in range(len(binning[var_names[2]]) - 1)],
                                         flow="clamp"
                                     ) for j in range(len(binning[var_names[1]]) - 1)
                                 ],
@@ -204,10 +253,16 @@ with open(input_samples_file, 'r') as f:
     samples_dict = yaml.safe_load(f)
 
 input_file_coeff = os.path.join(".", config['2D_HEFT']['coeff'])
+input_cov_file = os.path.join(".", config['2D_HEFT']['cov_matrix'])
 
 binning, coeffs_HEFT = read_coeff_binning_from_json(input_file_coeff)
+binning_, cov_HEFT = read_coeff_binning_from_json(input_cov_file)
 
-coeffs_HEFT = order_coeffs(coeffs_HEFT, binning)
+coeffs_HEFT = order_coeffs(coeffs_HEFT, binning, key_="fitted_parameters")
+cov_HEFT = order_coeffs(cov_HEFT, binning_, key_="covariance")
+
+sigma2_coeffs = save_max_error_from_cov(cov_HEFT, binning)
+print("sigma2 of coefficients from covariance matrix first bin:", sigma2_coeffs[0,0,0,:])
 
 print(binning)
 print("Coefficient shape:", coeffs_HEFT.shape)
@@ -216,20 +271,25 @@ print("coefficients, first bin (0,0,0):", coeffs_HEFT[0,0,0,:])
 sm_parameters = samples_dict['signals']['GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00']
 sm_parameters = prepare_params_for_poly(sm_parameters)
 poly_SM = np.dot(coeffs_HEFT, sm_parameters)
+error_SM = np.sqrt(np.dot(sigma2_coeffs, sm_parameters**2))
 
 poly_signals = {}
+error_signals = {}
 for key in samples_dict['signals'].keys():
     signals_params = samples_dict['signals'][key]
     signals_params = prepare_params_for_poly(signals_params)
     poly_signals[key] = np.dot(coeffs_HEFT, signals_params)
+    error_signals[key] = np.sqrt(np.dot(sigma2_coeffs, signals_params**2))
 
 poly_target = {}
+error_target = {}
 target_samples = config['target_samples']
 print("Target samples:", target_samples)
 for target_sample in target_samples:
     target_parameters = samples_dict['signals'][target_sample]
     target_parameters = prepare_params_for_poly(target_parameters)
     poly_target[target_sample] = np.dot(coeffs_HEFT, target_parameters)
+    error_target[target_sample] = np.sqrt(np.dot(sigma2_coeffs, target_parameters**2))
 
 # if save_poly_ratio:
 #     poly_ratio = {}
@@ -242,22 +302,30 @@ for target_sample in target_samples:
 #             poly_ratio[target_sample][key] = poly_target[target_sample] / poly_signals[key]
 # else:
 polys = {}
+errors = {}
 for key in poly_signals.keys():
     if key == 'GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00' or key == 'GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00':
         continue
     polys[key] = poly_signals[key]
+    errors[key] = error_signals[key]
 for key in poly_target.keys():
     polys[key] = poly_target[key]
+    errors[key] = error_target[key]
     
 if save_poly_ratio:
     poly_ratio = {}
     for target_sample in target_samples:
         poly_ratio[target_sample] = {}
         poly_ratio[target_sample]['GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00'] = poly_target[target_sample] / poly_SM
+        errors_ratio[target_sample] = {}
+        errors_ratio[target_sample]['GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00'] = np.sqrt((error_target[target_sample]/poly_SM)**2 + (poly_target[target_sample]*error_SM/poly_SM**2)**2)
         for key in poly_signals.keys():
             if key == 'GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00' or key == target_sample or key == 'GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00':
                 continue
             poly_ratio[target_sample][key] = poly_target[target_sample] / poly_signals[key]
-    CreateCorrectionLibfilePolyRatio(poly_ratio, binning, var_names=['pthh','theta','mhh'])
+            errors_ratio[target_sample][key] = np.sqrt((error_target[target_sample]/poly_signals[key])**2 + (poly_target[target_sample]*error_signals[key]/poly_signals[key]**2)**2)
+    if not dryrun:
+        CreateCorrectionLibfilePolyRatio(poly_ratio, binning, errors_ratio, var_names=['pthh','theta','mhh'])
 else:
-    CreateCorrectionLibfilePoly(polys, binning, var_names=['pthh','theta','mhh'])
+    if not dryrun:
+        CreateCorrectionLibfilePoly(polys, errors, binning, var_names=['pthh','theta','mhh'])

@@ -12,12 +12,16 @@ parser.add_option('--doReweight', dest='doReweight', action='store_true', defaul
 parser.add_option('--jsonFile', dest='jsonFile', type=str, default="./data/HEFT_reweighting.json", help='Path to the JSON file containing the reweighting information (output of HEFT_generalizedweight.py)')
 parser.add_option('-c', '--config', dest='config', type=str, default="./config/config.yaml", help='Path to the config file')
 parser.add_option('-o', '--output', dest='output', type=str, default="./plots/reweighted_sample.root", help='Path to the output ROOT file (of reweighted sample or target sample if --doTarget is set)')
+parser.add_option('-e', '--applyErrors', dest='applyErrors', action='store_true', default=False, help='If true, the script will also create histograms for the systematic uncertainty due to the reweighting procedure. This option can be used only if --doReweight is set')
+parser.add_option("--verbose", dest="verbose", action="store_true", default=False, help="Print verbose output for debugging")
 (opt, args) = parser.parse_args()
 doTarget = opt.doTarget
 doReweight = opt.doReweight
 output_name = opt.output
 config_path = opt.config
 json_file = opt.jsonFile
+applyErrors = opt.applyErrors
+verbose = opt.verbose
 if doTarget and doReweight:
     print("Error: Both doTarget and doReweight options cannot be true at the same time. Please choose one of them.")
     exit(1)
@@ -43,7 +47,7 @@ input_xsec = {}
 RSamples_inputs = ROOT.RDF.Experimental.RDatasetSpec()
 for s in config['input_samples']:
     input_files_path[s] = os.path.join(".",input_samples['signals'][s]['path'])
-    print(f"Input sample {s} path: {input_files_path[s]}")
+    if verbose: print(f"Input sample {s} path: {input_files_path[s]}")
     input_xsec[s] = input_samples['signals'][s]['xs']
     if "HLepRare" in input_files_path[s]:
         tmp_sample = ROOT.RDF.Experimental.RSample(s, "Events", os.path.join(input_files_path[s], "*.root"))
@@ -86,7 +90,7 @@ if doReweight:
             Nsample = -1
         else:
             Nsample = df_sample.Sum("nloweight").GetValue()
-        print(f"Total number of events (weighted) in input sample {s}: {Nsample}")
+        if verbose: print(f"Total number of events (weighted) in input sample {s}: {Nsample}")
         NtotalEvents[s] = Nsample
     ntotEvents_map = "std::map<std::string, double> NtotalEvents = {"
     ntot_entries = []
@@ -111,30 +115,41 @@ if doReweight:
         weight = f'(1./{str(len(config["input_samples"]))}) * weight_MC_Lumi_pu * input_xsec'
     else :
         weight = f'(1./{str(len(config["input_samples"]))}) * nloweight * input_xsec / NtotalEvents'
-    # elif len(config['input_samples']) == 1:
-    #     weight = f"nloweight * input_xsec / {NtotalEvents}"
-    #     NtotalEvents = df.Sum("nloweight").GetValue()
-    #     print(f"Total number of events (weighted) in input samples: {NtotalEvents}")
-    # else:
-    #     weight = f'(1./{str(len(config["input_samples"]))}) * nloweight * input_xsec / NtotalEvents'
-    
-    # if len(config['input_samples'])==1:
-    #     df = df.Define("w_nominal", weight)
-    #     df = df.Define("w_reweight", f'{weight} * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}")')
-    # else:
-    #     df = df.DefinePerSample(f"NtotalEvents", f'GetNtotalEvents(rdfsampleinfo_.GetSampleName())')
-    #     df = df.Define("w_nominal", f'{weight}')
-    #     df = df.Define("w_reweight", f'(1./{str(len(config["input_samples"]))}) * nloweight * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}") * input_xsec / NtotalEvents')
 
     df = df.Define("w_nominal", weight)
-    df = df.Define("w_reweight", f'{weight} * GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}")')
 
+    df = df.Define("HEFTweight", f'GetWeightFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}")')
+    if applyErrors:
+        df = df.Define("HEFTweight_error", f'GetWeightErrorFromPoly(mhh, pthh, costhetastar, SampleName, "{file}", "{target_sample_name}")')
+        df = df.Define("HEFTweight_up", f'HEFTweight + HEFTweight_error')
+        df = df.Define("HEFTweight_down", f'HEFTweight - HEFTweight_error')
+        # df = df.Vary("HEFTweight", "RVec<float>{HEFTweight_down, HEFTweight_up}", variationTags=["down", "up"], variationName="HEFTweight")
+    df = df.Define("w_reweight", f'{weight} * HEFTweight')
+    if applyErrors:
+        df = df.Define("w_reweight_up", f'{weight} * HEFTweight_up')
+        df = df.Define("w_reweight_down", f'{weight} * HEFTweight_down')
 
     output_file = ROOT.TFile(f"{output_name}", "RECREATE")
-    df.Histo1D(("mhh_nominal", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_nominal").GetValue().Write()
-    df.Histo1D(("mhh_weighted", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_reweight").GetValue().Write()
-    df.Histo1D(("pthh_weighted", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh", "w_reweight").GetValue().Write()
-    df.Histo1D(("costhetastar_weighted", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar", "w_reweight").GetValue().Write()
+    histos = {}
+    
+    histos["mhh_nominal"] = df.Histo1D(("mhh_nominal", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_nominal")
+    histos["mhh_weighted"] = df.Histo1D(("mhh_weighted", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_reweight")
+    histos["pthh_weighted"] = df.Histo1D(("pthh_weighted", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh", "w_reweight")
+    histos["costhetastar_weighted"] = df.Histo1D(("costhetastar_weighted", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar", "w_reweight")
+
+
+    if applyErrors:
+        histos["mhh_weighted_up"] = df.Histo1D(("mhh_weighted_up", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_reweight_up")
+        histos["mhh_weighted_down"] = df.Histo1D(("mhh_weighted_down", ";m_{HH} [GeV]; Events", len(mhh_binning)-1, mhh_binning), "mhh", "w_reweight_down")
+        histos["pthh_weighted_up"] = df.Histo1D(("pthh_weighted_up", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh", "w_reweight_up")
+        histos["pthh_weighted_down"] = df.Histo1D(("pthh_weighted_down", ";p_{T,HH} [GeV]; Events", len(pthh_binning)-1, pthh_binning), "pthh", "w_reweight_down")
+        histos["costhetastar_weighted_up"] = df.Histo1D(("costhetastar_weighted_up", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar", "w_reweight_up")
+        histos["costhetastar_weighted_down"] = df.Histo1D(("costhetastar_weighted_down", ";cos(#theta^{*}); Events", 20, -1, 1), "costhetastar", "w_reweight_down")
+    # else:
+    #     for h_name, h in histos.items():
+    #         histos[h_name] = h.GetValue()
+    for key in histos.keys():
+        histos[key].GetValue().Write()
 
     output_file.Close()
     print(f"Histograms saved to {output_name}")

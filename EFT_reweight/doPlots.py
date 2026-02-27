@@ -47,7 +47,7 @@ def plot(h, folder, fillcolor, canv_name = "canv" ,extraTest="Preliminary", iPos
     CMS.SaveCanvas(canv, folder+canv_name+".png", close = False)
     CMS.SaveCanvas(canv, folder+canv_name+".pdf")
 
-def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Preliminary", iPos=0, energy=13.6, lumi = 1,  addInfo="", ytitle = "Events"):
+def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Preliminary", iPos=0, energy=13.6, lumi = 1,  addInfo="", ytitle = "Events", error = False):
     CMS.SetExtraText(extraTest)
     iPos = iPos
     canv_name = canv_name
@@ -72,17 +72,30 @@ def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Prelimin
     pad1 = dicanv.cd(1)
     leg = CMS.cmsLeg(0.55, 0.79, 0.87, 0.89, textSize=0.04)
     if type(h)==list:
+        h_ratio = h[0].Clone()
+        h_ratio2 = h[0].Clone()
+        h_ratio1 = h[0].Clone()
         CMS.cmsDraw(h[0], "P", marker= 8, lcolor =  ROOT.TColor.GetColor("#e42536"), mcolor =  ROOT.TColor.GetColor("#e42536"))
         leg.AddEntry(h[0], "reweighted sample", "p")
         CMS.cmsDraw(h[1], "P", marker= 8, lcolor = ROOT.kBlack, mcolor = ROOT.kBlack)
         leg.AddEntry(h[1], "Simulated sample", "p")
+        if error:
+            CMS.cmsObjectDraw(h[2], "HIST", SetLineColor = ROOT.TColor.GetColor("#e42536"))
+            leg.AddEntry(h[2], "reweighted sample errorUp", "")
+            CMS.cmsObjectDraw(h[3], "HIST", SetLineColor = ROOT.TColor.GetColor("#e42536"))
+            leg.AddEntry(h[3], "reweighted sample errorDown", "")
+
         leg.Draw("same")
     else:
         pass
     pad2 = dicanv.cd(2)
-    h_ratio = h[0].Clone()
     h_ratio.Divide(h[1])
     CMS.cmsDraw(h_ratio, "esame")
+    if error:
+        h_ratio1.Divide(h[2])
+        CMS.cmsObjectDraw(h_ratio1, "HIST", SetLineColor = ROOT.TColor.GetColor("#e42536"))
+        h_ratio2.Divide(h[3])
+        CMS.cmsObjectDraw(h_ratio2, "HIST", SetLineColor = ROOT.TColor.GetColor("#e42536"))
     ref_line = ROOT.TLine(x_min, 1, x_max, 1)
     CMS.cmsDrawLine(ref_line, lcolor=ROOT.kBlack, lstyle=ROOT.kDotted)
     CMS.SaveCanvas(dicanv, folder+canv_name+".png", close = False)
@@ -90,22 +103,29 @@ def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Prelimin
 
 var = "mhh"
 inputs = "7"
-file_rw = ROOT.TFile.Open(f"./plots/anaTuple_{inputs}inputs.root")
+error = True 
+# file_rw = ROOT.TFile.Open(f"./plots/anaTuple_{inputs}inputs.root")
+file_rw = ROOT.TFile.Open(f"./plots/testerrors.root")
 # file_rw = ROOT.TFile.Open(f"./plots/pdfinputs.root")
 h1 = file_rw.Get(f"{var}_weighted")
 # h1 = file_rw.Get(f"h_mhh_output")
 h3 = file_rw.Get(f"{var}_nominal")
+h4 = file_rw.Get(f"{var}_weighted_up")
+h5 = file_rw.Get(f"{var}_weighted_down")
 file_or = ROOT.TFile.Open("./plots/anaTuple_target.root")
 h2 = file_or.Get(f"{var}_target")
 # h2 = file_rw.Get(f"h_mhh_target")
 h1.Scale(1.0, "width")
 h2.Scale(1.0, "width")
 h3.Scale(1.0, "width")
+h4.Scale(1.0, "width")
+h5.Scale(1.0, "width")
 
 
-hist_ = [h1, h2]
+hist_ = [h1, h2, h4, h5]
 
 # plot_withratio(hist_, "./", ROOT.kBlack, f"distr_{var}_{inputs}", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
-plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_reweighting_{inputs}inputs", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
+# plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_reweighting_{inputs}inputs", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}", error)
+plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_testerrors", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}", error=error)
 
 plot(h3, "./", ROOT.kRed, f"./plots/anatuple_{inputs}inputs_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")
