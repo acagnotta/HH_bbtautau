@@ -68,7 +68,7 @@ def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Prelimin
     y_max = y_max + 0.35 * (y_max - y_min)
     x_axis_name = h1.GetXaxis().GetTitle()
 
-    dicanv = CMS.cmsDiCanvas(canv_name, x_min, x_max, y_min, y_max, 0, 2, x_axis_name, ytitle, "ratio", square =True, iPos=iPos)
+    dicanv = CMS.cmsDiCanvas(canv_name, x_min, x_max, y_min, y_max, 0.5, 1.5, x_axis_name, ytitle, "ratio", square =True, iPos=iPos)
     pad1 = dicanv.cd(1)
     leg = CMS.cmsLeg(0.55, 0.79, 0.87, 0.89, textSize=0.04)
     if type(h)==list:
@@ -101,15 +101,18 @@ def plot_withratio(h, folder, fillcolor, canv_name = "canv" ,extraTest="Prelimin
     CMS.SaveCanvas(dicanv, folder+canv_name+".png", close = False)
     CMS.SaveCanvas(dicanv, folder+canv_name+".pdf")
 
-var = "mhh"
-inputs = "7"
+var = "costhetastar"#"costhetastar"# "pthh"
+inputs = "1"
 error = True 
 # file_rw = ROOT.TFile.Open(f"./plots/anaTuple_{inputs}inputs.root")
-file_rw = ROOT.TFile.Open(f"./plots/testerrors.root")
+# file_rw = ROOT.TFile.Open(f"./plots/testerrors.root")
+# file_rw = ROOT.TFile.Open(f"./plots/anaTuples_werrors_6input.root")
 # file_rw = ROOT.TFile.Open(f"./plots/pdfinputs.root")
+file_rw = ROOT.TFile.Open(f"./plots/anaTuples_werrors_weighted_avg.root")
+
 h1 = file_rw.Get(f"{var}_weighted")
 # h1 = file_rw.Get(f"h_mhh_output")
-h3 = file_rw.Get(f"{var}_nominal")
+# h3 = file_rw.Get(f"{var}_nominal")
 h4 = file_rw.Get(f"{var}_weighted_up")
 h5 = file_rw.Get(f"{var}_weighted_down")
 file_or = ROOT.TFile.Open("./plots/anaTuple_target.root")
@@ -117,15 +120,24 @@ h2 = file_or.Get(f"{var}_target")
 # h2 = file_rw.Get(f"h_mhh_target")
 h1.Scale(1.0, "width")
 h2.Scale(1.0, "width")
-h3.Scale(1.0, "width")
+# h3.Scale(1.0, "width")
 h4.Scale(1.0, "width")
 h5.Scale(1.0, "width")
 
+# Add statistical errors from h1 in quadrature to h4 and h5
+for iBin in range(1, h4.GetNbinsX() + 1):
+    stat_err_h1 = h1.GetBinError(iBin)
+    var_err_h4 = h4.GetBinContent(iBin) - h1.GetBinContent(iBin)  
+    var_err_h5 = h1.GetBinContent(iBin) - h5.GetBinContent(iBin)
+    
+    # Sum in quadrature: sqrt(stat_err^2 + var_err^2)
+    h4.SetBinContent(iBin, h1.GetBinContent(iBin) + (stat_err_h1**2 + var_err_h4**2)**0.5)
+    h5.SetBinContent(iBin, h1.GetBinContent(iBin) - (stat_err_h1**2 + var_err_h5**2)**0.5)
 
 hist_ = [h1, h2, h4, h5]
 
 # plot_withratio(hist_, "./", ROOT.kBlack, f"distr_{var}_{inputs}", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}")
 # plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_reweighting_{inputs}inputs", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}", error)
-plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/anatuple_testerrors", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}", error=error)
+plot_withratio(hist_, "./", ROOT.kBlack, f"./plots/{var}_anatuple_werrors_weighted_avg", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.35)", ytitle = "Events / bin width [GeV]^{-1}", error=error)
 
-plot(h3, "./", ROOT.kRed, f"./plots/anatuple_{inputs}inputs_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")
+# plot(h3, "./", ROOT.kRed, f"./plots/anatuple_{inputs}inputs_{var}_nominal", "Preliminary", 11, 13.6, 1, "(k_l=1.0, k_t=1.0, c_2=0.0)", ytitle = "Events / bin width [GeV]^{-1}")

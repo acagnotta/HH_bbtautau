@@ -261,17 +261,18 @@ binning_, cov_HEFT = read_coeff_binning_from_json(input_cov_file)
 coeffs_HEFT = order_coeffs(coeffs_HEFT, binning, key_="fitted_parameters")
 cov_HEFT = order_coeffs(cov_HEFT, binning_, key_="covariance")
 
-sigma2_coeffs = save_max_error_from_cov(cov_HEFT, binning)
-print("sigma2 of coefficients from covariance matrix first bin:", sigma2_coeffs[0,0,0,:])
-
 print(binning)
 print("Coefficient shape:", coeffs_HEFT.shape)
 print("coefficients, first bin (0,0,0):", coeffs_HEFT[0,0,0,:])
+print("Covariance matrix shape:", cov_HEFT.shape)
 
 sm_parameters = samples_dict['signals']['GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00']
 sm_parameters = prepare_params_for_poly(sm_parameters)
 poly_SM = np.dot(coeffs_HEFT, sm_parameters)
-error_SM = np.sqrt(np.dot(sigma2_coeffs, sm_parameters**2))
+sigma_SM = np.sqrt(sm_parameters.T @ cov_HEFT @ sm_parameters)
+print("SM parameters:", sm_parameters.shape)
+print("Poly value for SM sample:", poly_SM.shape)
+print("sigma for SM sample:", sigma_SM.shape)
 
 poly_signals = {}
 error_signals = {}
@@ -279,7 +280,8 @@ for key in samples_dict['signals'].keys():
     signals_params = samples_dict['signals'][key]
     signals_params = prepare_params_for_poly(signals_params)
     poly_signals[key] = np.dot(coeffs_HEFT, signals_params)
-    error_signals[key] = np.sqrt(np.dot(sigma2_coeffs, signals_params**2))
+    sigma_signal = np.sqrt(signals_params.T @ cov_HEFT @ signals_params)
+    error_signals[key] = sigma_signal
 
 poly_target = {}
 error_target = {}
@@ -289,18 +291,9 @@ for target_sample in target_samples:
     target_parameters = samples_dict['signals'][target_sample]
     target_parameters = prepare_params_for_poly(target_parameters)
     poly_target[target_sample] = np.dot(coeffs_HEFT, target_parameters)
-    error_target[target_sample] = np.sqrt(np.dot(sigma2_coeffs, target_parameters**2))
+    sigma_target = np.sqrt(target_parameters.T @ cov_HEFT @ target_parameters)
+    error_target[target_sample] = sigma_target
 
-# if save_poly_ratio:
-#     poly_ratio = {}
-#     for target_sample in target_samples:
-#         poly_ratio[target_sample] = {}
-#         poly_ratio[target_sample]['GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00'] = poly_target[target_sample] / poly_SM
-#         for key in poly_signals.keys():
-#             if key == 'GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00' or key == target_sample or key == 'GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00':
-#                 continue
-#             poly_ratio[target_sample][key] = poly_target[target_sample] / poly_signals[key]
-# else:
 polys = {}
 errors = {}
 for key in poly_signals.keys():
